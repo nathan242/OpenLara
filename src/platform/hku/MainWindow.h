@@ -11,6 +11,8 @@ class MainWindow : public BDirectWindow
 public:
 							MainWindow();
 	virtual					~MainWindow();
+
+    virtual void		    MessageReceived(BMessage* message);
 private:
 	GameView*				fGameView;
 };

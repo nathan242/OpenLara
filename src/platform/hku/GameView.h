@@ -9,6 +9,7 @@ public:
 						GameView(BRect frame);
 	virtual				~GameView();
 	virtual void		AttachedToWindow();
+    virtual void        FrameResized(float width, float height);
 	void				GameLoop();
 	
 protected:
