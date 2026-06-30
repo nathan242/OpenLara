@@ -133,10 +133,7 @@
         #include <SDL2/SDL_opengl_glext.h>
     #endif
 #elif __HAIKU__
-	#include <EGL/egl.h>
-	#include <EGL/eglext.h>
 	#include <GL/gl.h>
-	#include <GL/glext.h>
 #elif defined(_OS_PSC)
     #include <GLES3/gl3.h>
     #include <GLES2/gl2ext.h>
@@ -309,7 +306,7 @@
     #define glProgramBinary(...)
 #endif
 
-#if defined(_OS_WIN) || defined(_OS_LINUX) || defined(__HAIKU__) || defined(_OS_GCW0) || (defined(__SDL2__) && (defined(_GAPI_GLES2) || defined(_SDL2_OPENGL)))
+#if defined(_OS_WIN) || defined(_OS_LINUX) || defined(_OS_GCW0) || (defined(__SDL2__) && (defined(_GAPI_GLES2) || defined(_SDL2_OPENGL)))
 
     void* GetProc(const char *name) {
         #ifdef _OS_WIN
@@ -318,8 +315,6 @@
             return (void*)glXGetProcAddress((GLubyte*)name);
         #elif __SDL2__
             return (void*)SDL_GL_GetProcAddress(name);
-        #elif __HAIKU__
-        	return (void*)eglGetProcAddress(name);
         #else // EGL
             return (void*)eglGetProcAddress(name);
         #endif
@@ -332,11 +327,6 @@
 // Texture
     #ifdef _OS_WIN
         PFNGLACTIVETEXTUREPROC              glActiveTexture;
-    #endif
-    
-    #ifdef __HAIKU__
-        typedef int (*PFNGLXSWAPINTERVALSGIPROC) (int interval);
-        PFNGLXSWAPINTERVALSGIPROC glXSwapIntervalSGI;
     #endif
 
 // VSync
@@ -1213,9 +1203,6 @@ namespace GAPI {
                 GetProcOGL(wglSwapIntervalEXT);
             #elif _OS_LINUX
                 GetProcOGL(glXSwapIntervalSGI);
-            #elif __HAIKU__
-            	//GetProcOGL(glActiveTexture); // TODO: What does this do?
-            	GetProcOGL(glXSwapIntervalSGI);
             #endif
 
             #if defined(_OS_WIN) || defined(_OS_LINUX) || (defined(__SDL2__) && (defined(_GAPI_GLES2) || defined(_SDL2_OPENGL)))

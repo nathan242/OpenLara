@@ -141,8 +141,7 @@ void handleModifierKeyPress(int32 keys, int index) {
 
 int main() {
 	cacheDir[0] = saveDir[0] = contentDir[0] = 0;
-    char *lvlName = nullptr;
-    
+
     dev_t bootVolume = dev_for_path("/boot");
     
     if (find_directory(B_USER_CACHE_DIRECTORY, bootVolume, false, cacheDir, 255) != B_OK) {

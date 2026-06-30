@@ -1,5 +1,5 @@
 #include "GameView.h"
-
+#include <cstdio>
 //extern char *lvlName;
 //extern char cacheDir[255];
 //extern char saveDir[255];
@@ -26,6 +26,7 @@ GameView::GameView(BRect frame)
 {
    	Core::width  = frame.Width();
    	Core::height = frame.Height();
+    printf("width = %f  height = %f\n", frame.Width(), frame.Height());
 }
 
 GameView::~GameView()

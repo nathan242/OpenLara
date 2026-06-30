@@ -3,14 +3,28 @@
 extern void handleKeyPress(const char* keyBytes, int index);
 extern void handleModifierKeyPress(int32 keys, int index);
 
+namespace Core {
+	extern void reset();
+}
+
+static const uint32 kMsgGameStart = 'gmst';
+static const uint32 kMsgGameOpen = 'gmop';
+static const uint32 kMsgGameResetRenderer = 'gmrr';
+
 MainWindow::MainWindow()
 	:
-	BDirectWindow(BRect(320, 200), "OpenLara", B_TITLED_WINDOW,
+	BDirectWindow(BRect(100, 100, 420, 300), "OpenLara", B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE)
 {
-	fGameView = new GameView(Bounds());
-	
-	AddChild(fGameView);
+    BMenuBar* menuBar = _BuildMenu();
+    AddChild(menuBar);
+
+    BRect menuBounds = menuBar->Bounds();
+    fGameViewTop = menuBounds.bottom;
+    ResizeBy(0, fGameViewTop);
+    
+    fOpenPanel = new BFilePanel(B_OPEN_PANEL);
+    fOpenPanel->SetTarget(this);
 }
 
 MainWindow::~MainWindow()
@@ -18,8 +32,19 @@ MainWindow::~MainWindow()
 	
 }
 
+void MainWindow::_StartGame(const char *lvlName)
+{
+    fMenuStart->SetEnabled(false);
+    fMenuOpen->SetEnabled(false);
+
+    BRect gameViewBounds = Bounds();
+    gameViewBounds.top = fGameViewTop;
+	AddChild(new GameView(gameViewBounds));
+}
+
 void MainWindow::MessageReceived(BMessage* message)
 {
+    message->PrintToStream();
     switch (message->what) {
         case B_KEY_DOWN:
 		{
@@ -43,8 +68,46 @@ void MainWindow::MessageReceived(BMessage* message)
             message->FindInt32("modifiers", &keys);
             handleModifierKeyPress(keys, 1);
             break;
+            
+        case kMsgGameStart:
+            _StartGame();
+            break;
+            
+        case kMsgGameOpen:
+            fOpenPanel->Show();
+            break;
+            
+        case kMsgGameResetRenderer:
+            Core::reset();
+            break;
 
         default:
             BDirectWindow::MessageReceived(message);
     }
+}
+
+BMenuBar* MainWindow::_BuildMenu()
+{
+    BMenuBar* menuBar = new BMenuBar(Bounds(), "menuBar");
+    BMenu* gameMenu = new BMenu("Game");
+    
+    fMenuStart = new BMenuItem("Start", new BMessage(kMsgGameStart));
+    gameMenu->AddItem(fMenuStart);
+    
+    fMenuOpen = new BMenuItem("Open", new BMessage(kMsgGameOpen));
+    gameMenu->AddItem(fMenuOpen);
+    
+    gameMenu->AddSeparatorItem();
+
+    BMenuItem* item = new BMenuItem("Reset renderer", new BMessage(kMsgGameResetRenderer));
+    gameMenu->AddItem(item);
+    
+    gameMenu->AddSeparatorItem();
+    
+    item = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q');
+    gameMenu->AddItem(item);
+    
+    menuBar->AddItem(gameMenu);
+    
+    return menuBar;
 }

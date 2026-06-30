@@ -10,7 +10,8 @@ CC=g++
 # -std=c++11
 #CFLAGS+=-D__HAIKU__ -O3 -fno-exceptions -fno-rtti -ffunction-sections -fdata-sections -Wl,--gc-sections -Wall
 CFLAGS+=-g -D__HAIKU__ -DGL_GLEXT_PROTOTYPES -ffunction-sections -fdata-sections -Wl,--gc-sections -Wall
-LDFLAGS+=-lm -lpthread -lbe -lgame -lGL -lEGL
+#LDFLAGS+=-lm -lpthread -lbe -lgame -lGL -lEGL
+LDFLAGS+=-lm -lpthread -lbe -lgame -lGL -ltracker
 
 
 INCLUDES+=-I../../

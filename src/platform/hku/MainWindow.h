@@ -3,6 +3,10 @@
 
 
 #include <DirectWindow.h>
+#include <FilePanel.h>
+#include <Menu.h>
+#include <MenuBar.h>
+#include <MenuItem.h>
 #include "GameView.h"
 
 
@@ -14,7 +18,13 @@ public:
 
     virtual void		    MessageReceived(BMessage* message);
 private:
-	GameView*				fGameView;
+    BMenuBar*               _BuildMenu();
+    void                    _StartGame(const char *lvlName = NULL);
+    
+    float                   fGameViewTop;
+    BMenuItem*              fMenuStart;
+    BMenuItem*              fMenuOpen;
+    BFilePanel*             fOpenPanel;
 };
 
 
