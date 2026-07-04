@@ -32,7 +32,7 @@ int osGetTimeMS() {
 }
 
 void sndFill(void *cookie, void *buffer, size_t size, const media_raw_audio_format &format) {
-	Sound::fill(sndData, SND_FRAMES * SND_FRAME_SIZE);
+	Sound::fill(sndData, SND_FRAMES);
 	memcpy(buffer, sndData, SND_FRAMES * SND_FRAME_SIZE);
 }
 
