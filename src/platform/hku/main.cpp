@@ -5,6 +5,8 @@
 #include <SupportDefs.h>
 #include <storage/FindDirectory.h>
 #include <kernel/fs_info.h>
+#include <media/MediaDefs.h>
+#include <media/SoundPlayer.h>
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include "game.h"
@@ -19,22 +21,39 @@ unsigned int startTime;
 
 Sound::Frame        *sndData;
 
+media_raw_audio_format sndFormat;
+
+BSoundPlayer *sndPlayer;
+
 int osGetTimeMS() {
     timeval t;
     gettimeofday(&t, NULL);
     return int((t.tv_sec - startTime) * 1000 + t.tv_usec / 1000);
 }
 
-/**void sndFill(void *udata, Uint8 *stream, int len) {
-	
-}**/
+void sndFill(void *cookie, void *buffer, size_t size, const media_raw_audio_format &format) {
+	Sound::fill(sndData, SND_FRAMES * SND_FRAME_SIZE);
+	memcpy(buffer, sndData, SND_FRAMES * SND_FRAME_SIZE);
+}
 
-bool sndInit() {
-	return true;
+void sndInit() {
+	sndFormat.buffer_size = SND_FRAMES * SND_FRAME_SIZE;
+	sndFormat.format = media_raw_audio_format::B_AUDIO_SHORT;
+	sndFormat.channel_count = 2;
+	sndFormat.frame_rate = 44100.0;
+	sndFormat.byte_order = B_MEDIA_LITTLE_ENDIAN;
+	
+	sndPlayer = new BSoundPlayer(&sndFormat, "sndPlayer", sndFill, NULL, NULL);
+	
+	sndData = new Sound::Frame[SND_FRAMES * SND_FRAME_SIZE];
+	
+	sndPlayer->Start();
+	sndPlayer->SetHasData(true);
 }
 
 void sndFree() {
-
+	sndPlayer->Stop();
+	delete sndPlayer;
 }
 
 /**bool isKeyPressed (SDL_Scancode scancode) {
@@ -183,9 +202,12 @@ int main() {
    	timeval t;
    	gettimeofday(&t, NULL);
    	startTime = t.tv_sec;
+	
+	//sndInit();
 
 	App* app = new App();
 	app->Run();
 	delete app;
+	//sndFree();
 	return 0;
 }

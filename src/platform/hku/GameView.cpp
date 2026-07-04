@@ -19,6 +19,10 @@ namespace Core {
 	extern void waitVBlank();
 }
 
+extern void sndInit();
+extern void sndFree();
+extern void sndFill();
+
 GameView::GameView(BRect frame)
 	:
 	BGLView(frame, "gameView", B_FOLLOW_ALL, B_WILL_DRAW,
@@ -28,10 +32,13 @@ GameView::GameView(BRect frame)
     fGameRenderThread = 0;
    	Core::width  = frame.Width();
    	Core::height = frame.Height();
+	
+	sndInit();
 }
 
 GameView::~GameView()
 {
+	sndFree();
 }
 
 void GameView::StartGame(const char *lvlName)
