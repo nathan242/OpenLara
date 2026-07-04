@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 
+#include <Path.h>
 #include <DirectWindow.h>
 #include <FilePanel.h>
 #include <Menu.h>
@@ -17,14 +18,20 @@ public:
 	virtual					~MainWindow();
 
     virtual void		    MessageReceived(BMessage* message);
+    virtual bool            QuitRequested();
 private:
     BMenuBar*               _BuildMenu();
-    void                    _StartGame(const char *lvlName = NULL);
+    void                    _StartGame(const char *lvlName = nullptr);
+    void                    _StopGame();
     
     float                   fGameViewTop;
     BMenuItem*              fMenuStart;
     BMenuItem*              fMenuOpen;
+    BMenuItem*              fMenuQuickSave;
+    BMenuItem*              fMenuQuickLoad;
+    GameView*               fGameView;
     BFilePanel*             fOpenPanel;
+    char                    fLvlName[255];
 };
 
 

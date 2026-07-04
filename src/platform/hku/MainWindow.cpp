@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 
+extern char contentDir[255];
 extern void handleKeyPress(const char* keyBytes, int index);
 extern void handleModifierKeyPress(int32 keys, int index);
 
@@ -7,7 +8,14 @@ namespace Core {
 	extern void reset();
 }
 
+namespace Game {
+    extern void quickSave();
+    extern void quickLoad(bool forced = false);
+}
+
 static const uint32 kMsgGameStart = 'gmst';
+static const uint32 kMsgQuickSave = 'gmqs';
+static const uint32 kMsgQuickLoad = 'gmql';
 static const uint32 kMsgGameOpen = 'gmop';
 static const uint32 kMsgGameResetRenderer = 'gmrr';
 
@@ -16,6 +24,8 @@ MainWindow::MainWindow()
 	BDirectWindow(BRect(100, 100, 420, 300), "OpenLara", B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE)
 {
+    fLvlName[0] = '\0';
+
     BMenuBar* menuBar = _BuildMenu();
     AddChild(menuBar);
 
@@ -23,8 +33,14 @@ MainWindow::MainWindow()
     fGameViewTop = menuBounds.bottom;
     ResizeBy(0, fGameViewTop);
     
+    BRect gameViewBounds = Bounds();
+    gameViewBounds.top = fGameViewTop;
+    fGameView = new GameView(gameViewBounds);
+	AddChild(fGameView);
+    
     fOpenPanel = new BFilePanel(B_OPEN_PANEL);
     fOpenPanel->SetTarget(this);
+    fOpenPanel->SetPanelDirectory(contentDir);
 }
 
 MainWindow::~MainWindow()
@@ -34,17 +50,24 @@ MainWindow::~MainWindow()
 
 void MainWindow::_StartGame(const char *lvlName)
 {
+    if (fGameView->IsRunning())
+        return;
+
     fMenuStart->SetEnabled(false);
     fMenuOpen->SetEnabled(false);
+    fMenuQuickSave->SetEnabled(true);
+    fMenuQuickLoad->SetEnabled(true);
 
-    BRect gameViewBounds = Bounds();
-    gameViewBounds.top = fGameViewTop;
-	AddChild(new GameView(gameViewBounds));
+    fGameView->StartGame(lvlName);
+}
+
+void MainWindow::_StopGame()
+{
+    fGameView->StopGame();
 }
 
 void MainWindow::MessageReceived(BMessage* message)
 {
-    message->PrintToStream();
     switch (message->what) {
         case B_KEY_DOWN:
 		{
@@ -72,6 +95,14 @@ void MainWindow::MessageReceived(BMessage* message)
         case kMsgGameStart:
             _StartGame();
             break;
+        
+        case kMsgQuickSave:
+            Game::quickSave();
+            break;
+            
+        case kMsgQuickLoad:
+            Game::quickLoad();
+            break;
             
         case kMsgGameOpen:
             fOpenPanel->Show();
@@ -80,10 +111,39 @@ void MainWindow::MessageReceived(BMessage* message)
         case kMsgGameResetRenderer:
             Core::reset();
             break;
+            
+        case B_REFS_RECEIVED:
+        {
+            entry_ref ref;
+            if (message->FindRef("refs", &ref) == B_OK) {
+                BEntry entry(&ref, false);
+                if (entry.InitCheck() == B_OK) {
+                    BPath path;
+                    entry.GetPath(&path);
+                    
+                    const char* pathStr = path.Path();
+                    
+                    if (strlen(pathStr) < 255)
+                        strcpy(fLvlName, pathStr);
+
+                    _StartGame(fLvlName);
+                }
+            }
+            
+            break;
+        }
 
         default:
             BDirectWindow::MessageReceived(message);
     }
+}
+
+bool MainWindow::QuitRequested()
+{
+    if (fGameView->IsRunning())
+        _StopGame();
+        
+    return true;
 }
 
 BMenuBar* MainWindow::_BuildMenu()
@@ -94,8 +154,18 @@ BMenuBar* MainWindow::_BuildMenu()
     fMenuStart = new BMenuItem("Start", new BMessage(kMsgGameStart));
     gameMenu->AddItem(fMenuStart);
     
-    fMenuOpen = new BMenuItem("Open", new BMessage(kMsgGameOpen));
+    fMenuOpen = new BMenuItem("Open...", new BMessage(kMsgGameOpen));
     gameMenu->AddItem(fMenuOpen);
+    
+    gameMenu->AddSeparatorItem();
+    
+    fMenuQuickSave = new BMenuItem("Quick Save", new BMessage(kMsgQuickSave));
+    fMenuQuickSave->SetEnabled(false);
+    gameMenu->AddItem(fMenuQuickSave);
+    
+    fMenuQuickLoad = new BMenuItem("Quick Load", new BMessage(kMsgQuickLoad));
+    fMenuQuickLoad->SetEnabled(false);
+    gameMenu->AddItem(fMenuQuickLoad);
     
     gameMenu->AddSeparatorItem();
 

@@ -8,9 +8,10 @@ class GameView : public BGLView
 public:
 						GameView(BRect frame);
 	virtual				~GameView();
-	virtual void		AttachedToWindow();
     virtual void        FrameResized(float width, float height);
-	void				GameLoop();
+    void                StartGame(const char *lvlName);
+    void                StopGame();
+    bool                IsRunning();
 	
 protected:
 	void				_CreateGameRenderThread();
@@ -18,6 +19,9 @@ protected:
 	void				_GameRenderLoop();
 	
 	thread_id			fGameRenderThread;
+    
+private:
+    const char*               fLvlName;
 };
 
 #endif // GAMEVIEW_H
