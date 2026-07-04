@@ -14,10 +14,11 @@ namespace Game {
 }
 
 static const uint32 kMsgGameStart = 'gmst';
+static const uint32 kMsgGameOpen = 'gmop';
 static const uint32 kMsgQuickSave = 'gmqs';
 static const uint32 kMsgQuickLoad = 'gmql';
-static const uint32 kMsgGameOpen = 'gmop';
 static const uint32 kMsgGameResetRenderer = 'gmrr';
+static const uint32 kMsgOpenContentDir = 'opcd';
 
 MainWindow::MainWindow()
 	:
@@ -25,6 +26,8 @@ MainWindow::MainWindow()
 		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE)
 {
     fLvlName[0] = '\0';
+    
+    strcpy(fContentDir, contentDir);
 
     BMenuBar* menuBar = _BuildMenu();
     AddChild(menuBar);
@@ -95,6 +98,20 @@ void MainWindow::MessageReceived(BMessage* message)
         case kMsgGameStart:
             _StartGame();
             break;
+           
+        case kMsgGameOpen:
+            fOpenPanel->Show();
+            break;
+            
+        case kMsgOpenContentDir:
+        {
+            entry_ref ref;
+            BEntry entry(fContentDir);
+            if (entry.Exists() && entry.GetRef(&ref) == B_OK)
+                be_roster->Launch(&ref);
+            
+            break;
+        }
         
         case kMsgQuickSave:
             Game::quickSave();
@@ -103,11 +120,7 @@ void MainWindow::MessageReceived(BMessage* message)
         case kMsgQuickLoad:
             Game::quickLoad();
             break;
-            
-        case kMsgGameOpen:
-            fOpenPanel->Show();
-            break;
-            
+
         case kMsgGameResetRenderer:
             Core::reset();
             break;
@@ -159,6 +172,11 @@ BMenuBar* MainWindow::_BuildMenu()
     
     gameMenu->AddSeparatorItem();
     
+    BMenuItem* item = new BMenuItem("Open content dir...", new BMessage(kMsgOpenContentDir));
+    gameMenu->AddItem(item);
+    
+    gameMenu->AddSeparatorItem();
+    
     fMenuQuickSave = new BMenuItem("Quick Save", new BMessage(kMsgQuickSave));
     fMenuQuickSave->SetEnabled(false);
     gameMenu->AddItem(fMenuQuickSave);
@@ -169,7 +187,7 @@ BMenuBar* MainWindow::_BuildMenu()
     
     gameMenu->AddSeparatorItem();
 
-    BMenuItem* item = new BMenuItem("Reset renderer", new BMessage(kMsgGameResetRenderer));
+    item = new BMenuItem("Reset renderer", new BMessage(kMsgGameResetRenderer));
     gameMenu->AddItem(item);
     
     gameMenu->AddSeparatorItem();

@@ -32,6 +32,7 @@ private:
     GameView*               fGameView;
     BFilePanel*             fOpenPanel;
     char                    fLvlName[255];
+    char                    fContentDir[255];
 };
 
 
