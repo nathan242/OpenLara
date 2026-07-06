@@ -13,8 +13,11 @@ LDFLAGS+=-lm -lpthread -lbe -lgame -lGL -ltracker -lmedia
 
 INCLUDES+=-I../../
 
-openlara :
+OpenLara :
 	$(CC) $(INCLUDES) $(CFLAGS) $(LDFLAGS) $(SRCS) -o $@
+	rc -o Resources.rsrc Resources.rdef
+	xres -o OpenLara Resources.rsrc
 
 clean:
 	rm -f OpenLara
+	rm -f Resources.rsrc

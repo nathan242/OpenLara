@@ -22,7 +22,7 @@ static const uint32 kMsgOpenContentDir = 'opcd';
 
 MainWindow::MainWindow()
 	:
-	BDirectWindow(BRect(100, 100, 420, 300), "OpenLara", B_TITLED_WINDOW,
+	BDirectWindow(BRect(100, 100, 740, 580), "OpenLara", B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE)
 {
 	fLvlName[0] = '\0';

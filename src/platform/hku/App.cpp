@@ -1,6 +1,6 @@
 #include "App.h"
 
-const char* kApplicationSignature = "application/x-vnd.nathan242-OpenLara";
+const char* kApplicationSignature = "application/x-vnd.XProger-OpenLara";
 
 
 App::App()
