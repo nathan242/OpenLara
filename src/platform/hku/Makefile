@@ -7,8 +7,7 @@ SRCS=main.cpp \
 	 ../../libs/tinf/tinflate.c
 CC=g++
 
-#CFLAGS+=-O3
-CFLAGS+=-g -D__HAIKU__ -DGL_GLEXT_PROTOTYPES -ffunction-sections -fdata-sections -Wl,--gc-sections -Wall
+CFLAGS+=-O3 -D__HAIKU__ -DGL_GLEXT_PROTOTYPES -ffunction-sections -fdata-sections -Wl,--gc-sections -Wall
 LDFLAGS+=-lm -lpthread -lbe -lgame -lGL -ltracker -lmedia
 
 INCLUDES+=-I../../
