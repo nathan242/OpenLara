@@ -11,6 +11,7 @@ App::App()
 	mainWindow->Show();
 }
 
+
 App::~App()
 {
 }

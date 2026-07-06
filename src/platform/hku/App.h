@@ -6,11 +6,11 @@
 #include "MainWindow.h"
 
 
-class App : public BApplication 
+class App : public BApplication
 {
 public:
-							App();
-	virtual					~App();
+								App();
+	virtual						~App();
 private:
 
 };

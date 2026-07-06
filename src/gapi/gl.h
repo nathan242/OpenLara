@@ -407,10 +407,10 @@
 	// Binary shaders
 	    PFNGLGETPROGRAMBINARYPROC           glGetProgramBinary;
 	    PFNGLPROGRAMBINARYPROC              glProgramBinary;
-	
+
 	    #if defined(_GAPI_GLES)
 	        PFNGLDISCARDFRAMEBUFFEREXTPROC      glDiscardFramebufferEXT;
-	    #endif 
+	    #endif
 	#endif
 #endif
 

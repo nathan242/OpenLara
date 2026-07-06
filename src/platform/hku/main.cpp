@@ -12,15 +12,13 @@
 #include "game.h"
 #include "App.h"
 
-// timing
+
 unsigned int startTime;
 
-// sound
 #define SND_FRAME_SIZE  4
 #define SND_FRAMES      1024
 
-Sound::Frame        *sndData;
-
+Sound::Frame *sndData;
 media_raw_audio_format sndFormat;
 
 BSoundPlayer *sndPlayer;
@@ -32,47 +30,31 @@ int osGetTimeMS() {
 }
 
 void sndFill(void *cookie, void *buffer, size_t size, const media_raw_audio_format &format) {
-	Sound::fill(sndData, SND_FRAMES);
-	memcpy(buffer, sndData, SND_FRAMES * SND_FRAME_SIZE);
+    Sound::fill(sndData, SND_FRAMES);
+    memcpy(buffer, sndData, SND_FRAMES * SND_FRAME_SIZE);
 }
 
 void sndInit() {
-	sndFormat.buffer_size = SND_FRAMES * SND_FRAME_SIZE;
-	sndFormat.format = media_raw_audio_format::B_AUDIO_SHORT;
-	sndFormat.channel_count = 2;
-	sndFormat.frame_rate = 44100.0;
-	sndFormat.byte_order = B_MEDIA_LITTLE_ENDIAN;
-	
-	sndPlayer = new BSoundPlayer(&sndFormat, "sndPlayer", sndFill, NULL, NULL);
-	
-	sndData = new Sound::Frame[SND_FRAMES * SND_FRAME_SIZE];
-	
-	sndPlayer->Start();
-	sndPlayer->SetHasData(true);
+    sndFormat.buffer_size = SND_FRAMES * SND_FRAME_SIZE;
+    sndFormat.format = media_raw_audio_format::B_AUDIO_SHORT;
+    sndFormat.channel_count = 2;
+    sndFormat.frame_rate = 44100.0;
+    sndFormat.byte_order = B_MEDIA_LITTLE_ENDIAN;
+
+    sndPlayer = new BSoundPlayer(&sndFormat, "sndPlayer", sndFill, NULL, NULL);
+
+    sndData = new Sound::Frame[SND_FRAMES * SND_FRAME_SIZE];
+
+    sndPlayer->Start();
+    sndPlayer->SetHasData(true);
 }
 
 void sndFree() {
-	sndPlayer->Stop();
-	delete sndPlayer;
+    sndPlayer->Stop();
+    delete sndPlayer;
 }
-
-/**bool isKeyPressed (SDL_Scancode scancode) {
-    
-}**/
 
 void osJoyVibrate(int index, float L, float R) {
-}
-
-bool inputInit() {
-    return true;
-}
-
-void inputFree() {
-    
-}
-
-void inputUpdate() {
-	
 }
 
 InputKey codeToInputKey(const char* code) {
@@ -162,52 +144,49 @@ int main() {
 	cacheDir[0] = saveDir[0] = contentDir[0] = 0;
 
     dev_t bootVolume = dev_for_path("/boot");
-    
+
     if (find_directory(B_USER_CACHE_DIRECTORY, bootVolume, false, cacheDir, 255) != B_OK) {
         fputs("Cannot get B_USER_CACHE_DIRECTORY\n", stderr);
         return 1;
     }
-    
+
     if (find_directory(B_USER_SETTINGS_DIRECTORY, bootVolume, false, saveDir, 255) != B_OK) {
         fputs("Cannot get B_USER_SETTINGS_DIRECTORY\n", stderr);
         return 1;
     }
-    
+
     if (find_directory(B_USER_NONPACKAGED_DATA_DIRECTORY, bootVolume, false, contentDir, 255) != B_OK) {
         fputs("Cannot get B_USER_NONPACKAGED_DATA_DIRECTORY\n", stderr);
         return 1;
     }
-    
+
     strcat(cacheDir, "/openlara/");
     strcat(saveDir, "/openlara/");
     strcat(contentDir, "/openlara/");
-    
+
     struct stat st = {0};
-    
+
     if (stat(cacheDir, &st) == -1 && mkdir(cacheDir, 0777) == -1) {
         fprintf(stderr, "Cannot create cache dir %s\n", cacheDir);
         return 1;
     }
-    
+
     if (stat(saveDir, &st) == -1 && mkdir(saveDir, 0777) == -1) {
         fprintf(stderr, "Cannot create save dir %s\n", saveDir);
         return 1;
     }
-    
+
     if (stat(contentDir, &st) == -1 && mkdir(contentDir, 0777) == -1) {
         fprintf(stderr, "Cannot create content dir %s\n", contentDir);
         return 1;
     }
 
-   	timeval t;
-   	gettimeofday(&t, NULL);
-   	startTime = t.tv_sec;
-	
-	//sndInit();
+    timeval t;
+    gettimeofday(&t, NULL);
+    startTime = t.tv_sec;
 
-	App* app = new App();
-	app->Run();
-	delete app;
-	//sndFree();
-	return 0;
+    App* app = new App();
+    app->Run();
+    delete app;
+    return 0;
 }
